@@ -3,12 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:unit_converter/category.dart';
-import 'package:unit_converter/unit.dart';
 
-// TODO: Check if we need to import anything
+import 'category.dart';
+import 'unit.dart';
 
-// TODO: Define any constants
+final _backgroundColor = Colors.green[100];
 
 /// Category Route (screen).
 ///
@@ -17,8 +16,30 @@ import 'package:unit_converter/unit.dart';
 ///
 /// While it is named CategoryRoute, a more apt name would be CategoryScreen,
 /// because it is responsible for the UI at the route's destination.
-class CategoryRoute extends StatelessWidget {
-  const CategoryRoute();
+// TODO: Make CategoryRoute a StatefulWidget
+class CategoryRoute extends StatefulWidget {
+  CategoryRoute();
+
+  // TODO: Create State object for the CategoryRoute
+  @override
+  createState() => _CategoryRouteState();
+}
+
+class _CategoryRouteState extends State<CategoryRoute> {
+  
+  var categories = <Category>[];
+
+  @override
+  initState() {
+    for (var i = 0; i < _categoryNames.length; i++) {
+      categories.add(Category(
+        name: _categoryNames[i],
+        color: _baseColors[i],
+        iconLocation: Icons.cake,
+        units: _retrieveUnitList(_categoryNames[i]),
+      ));
+    }
+  }
 
   static const _categoryNames = <String>[
     'Length',
@@ -31,8 +52,6 @@ class CategoryRoute extends StatelessWidget {
     'Currency',
   ];
 
-  static const _icon = Icons.cake;
-
   static const _baseColors = <Color>[
     Colors.teal,
     Colors.orange,
@@ -44,38 +63,52 @@ class CategoryRoute extends StatelessWidget {
     Colors.red,
   ];
 
+  /// Makes the correct number of rows for the list view.
+  ///
+  /// For portrait, we use a [ListView].
+  Widget _buildCategoryWidgets() {
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int index) => categories[index],
+      itemCount: categories.length,
+    );
+  }
+
+  /// Returns a list of mock [Unit]s.
+  List<Unit> _retrieveUnitList(String categoryName) {
+    return List.generate(10, (int i) {
+      i += 1;
+      return Unit(
+        name: '$categoryName Unit $i',
+        conversion: i.toDouble(),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // TODO: Create a list of the eight Categories, using the names and colors
-    // from above. Use a placeholder icon, such as `Icons.cake` for each
-    // Category. We'll add custom icons later.
+    // TODO: Instead of re-creating a list of Categories in every build(),
+    // save this as a variable inside the State object and create
+    // the list at initialization (in initState()).
+    // This way, you also don't have to pass in the list of categories to
+    // _buildCategoryWidgets()
 
-    // TODO: Create a list view of the Categories
     final listView = Container(
-        color: Colors.green[100],
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: ListView.builder(
-          itemCount: _categoryNames.length,
-          itemBuilder: (context, index) {
-            return Category(
-              name: _categoryNames[index],
-              color: _baseColors[index],
-              iconLocation: _icon,
-              units: <Unit>[
-                Unit(name: 'Meter', conversion: 1.0),
-                Unit(name: 'Centimeter', conversion: 100.0)
-              ],
-            );
-          },
-        ));
+      color: _backgroundColor,
+      padding: EdgeInsets.symmetric(horizontal: 8.0),
+      child: _buildCategoryWidgets(),
+    );
 
-    // TODO: Create an App Bar
     final appBar = AppBar(
-      title: Text('Unit Converter',
-          style: TextStyle(color: Colors.black, fontSize: 30.0)),
-      centerTitle: true,
       elevation: 0.0,
-      backgroundColor: Colors.green[100],
+      title: Text(
+        'Unit Converter',
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 30.0,
+        ),
+      ),
+      centerTitle: true,
+      backgroundColor: _backgroundColor,
     );
 
     return Scaffold(
